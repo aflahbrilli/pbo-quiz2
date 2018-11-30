@@ -12,8 +12,10 @@ import javax.swing.table.DefaultTableModel;
 import com.aflahbrilli.quiz2pbo.*;
 import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-
+import javax.swing.UnsupportedLookAndFeelException;
 
 public class JualBeliFrame extends javax.swing.JFrame {
 
@@ -42,16 +44,16 @@ public class JualBeliFrame extends javax.swing.JFrame {
     
     //add item obj
     
-    private Object[] addItem(String name, int jumlah){
+    private Object[] addItem(String nama, int jumlah){
         float harga = 0;
         ComboModel items = new ComboModel();
         for (int i = 0; i < items.getHargaBarang().size(); i++) {
-            if (name.equalsIgnoreCase(items.getJenisName().get(i))) {
+            if (nama.equalsIgnoreCase(items.getJenisNama().get(i))) {
                 harga = items.getHargaBarang().get(i);
                 }
             }
             Object[] obj ={
-                name,
+                nama,
                 harga,
                 jumlah,
             };
@@ -62,7 +64,7 @@ public class JualBeliFrame extends javax.swing.JFrame {
         this.incId();
         //tanggal
         String sk = new SimpleDateFormat("yyMMdd").format(new date());
-        this.Code = String.format(sk+ "%02d", this.id);
+        this.code = String.format(sk+ "%02d", this.id);
         return code;
     }
     
@@ -249,6 +251,25 @@ public class JualBeliFrame extends javax.swing.JFrame {
     /**
      * @param args the command line arguments
      */
+    
+    public void saveButtonActionPerformed(java.awt.event.ActionEvent evt){
+        try {
+            //loop tiap tabel
+            for (int i = 0; i < tbModel.getRowCount(); i++) {
+                String nama = tbModel.getValueAt(i, 0).toString();
+                float harga = new Float(tbModel.getValueAt(i, 1).toString());
+                int jumlah = new Integer(tbModel.getValueAt(i, 2).toString());
+                this.belanja.add(new Item(nama, harga, jumlah));
+            }
+            Transaksi transaksi = new Transaksi(this.code, this.belanja);
+            StringBuilder sbr = new StringBuilder();
+            sbr.append(transaksi.Pembayaran());
+            JOptionPane.showMessageDialog(this, sbr, "transaksi", JOptionPane.INFORMATION_MESSAGE);
+            newTransaksi();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -274,11 +295,87 @@ public class JualBeliFrame extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+            try {
+            for(javax.swing.UIManager.LookAndFeelInfo info: javax.swing.UIManager.getInstalledLookAndFeels()){
+                if("Nimbus".equals(info.getName())){
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(JualBeliFrame.class.getName()).log(java.util.logging.Level.SEVERE, null,ex);
+            } catch (InstantiationException ex) {
+            Logger.getLogger(JualBeliFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(JualBeliFrame.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedLookAndFeelException ex) {
+            Logger.getLogger(JualBeliFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new JualBeliFrame().setVisible(true);
             }
         });
+    }
+    
+    private void itemsTextActionPerformed(java.awt.event.ActionEvent evt){
+        
+    }
+    
+    private void newButtonActionPerformed(java.awt.event.ActionEvent evt){
+        this.itemsText.setText("1");
+        this.NewButton.setEnabled(false);
+        this.CancelButton.setEnabled(true);
+        this.AddButton.setEnabled(true);
+        this.itemsText.setEnabled(true);
+        this.itemCombo.setEnabled(true);
+        this.codeText.setText(this.setCode());
+    }
+    
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt){
+        String nama= this.itemCombo.getSelectedItem().toString();
+        int jumlah = new Integer(this.itemsText.getText());
+        
+        if(Duplicate(nama)){
+            updateJumlah(nama, jumlah);
+            
+        }else{
+            tbModel.addRow(addItem(nama, jumlah));
+        }
+        this.belanja();
+    }
+    
+    private void cancelButtonActionPerformed(java.awt.event.ActionEvent evt){
+        newTransaksi();
+        this.decId();
+    }
+    
+    private void addButtonPerformed(java.awt.event.ActionEvent evt){
+        this.itemsText.setText("1");
+        this.NewButton.setEnabled(false);
+        this.CancelButton.setEnabled(true);
+        this.AddButton.setEnabled(true);
+        this.itemsText.setEnabled(true);
+        this.itemCombo.setEnabled(true);
+        this.codeText.setText(this.setCode());
+    }
+    
+    private void CancelButtonActionPerformed(java.awt.event.ActionEvent evt){
+        newTransaksi();
+        this.decId();
+    }
+    
+    private void RemoveButtonActionPerfomed(java.awt.event.ActionEvent evt){
+        if (transaksiTable.getSelectedRow()<0) {
+            String sbr = "pilih item mau dihapus";
+            JOptionPane.showMessageDialog(this, sbr, "information", JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            int count = transaksiTable.getSelectedRow().length;
+            for (int i = 0; i < count; i++) {
+                tbModel.removeRow(transaksiTable.getSelectedRow());
+            }
+        }
+        this.belanja();
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
