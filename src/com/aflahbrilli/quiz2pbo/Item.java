@@ -11,18 +11,19 @@ package com.aflahbrilli.quiz2pbo;
  */
 public class Item {
     private String name;
-    private double harga;
-    private String jumlah;
+    private float harga;
+    private int jumlah;
 
-    public Item(String name, double harga) {
-        this.name = name;
-        this.harga = harga;
-    }
-    
     public Item(){
         
     }
-    
+
+    public Item(String name, float harga, int jumlah) {
+        this.name = name;
+        this.harga = harga;
+        this.jumlah = jumlah;
+    }
+
     public String getName() {
         return name;
     }
@@ -31,21 +32,27 @@ public class Item {
         this.name = name;
     }
 
-    public double getHarga() {
+    public float getHarga() {
         return harga;
     }
 
-    public void setHarga(double harga) {
+    public void setHarga(float harga) {
         this.harga = harga;
     }
 
-    public String getJumlah() {
+    public int getJumlah() {
         return jumlah;
     }
 
-    public void setJumlah(String jumlah) {
+    public void setJumlah(int jumlah) {
         this.jumlah = jumlah;
     }
     
+    public float getTotal(){
+        return this.harga * this.jumlah;
+    }
     
+    public String toString(){
+        return this.name;
+    }
 }
